@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 interface InputValues {
   card_type: string;
@@ -7,11 +8,25 @@ interface InputValues {
   amount: number;
   store_name: string;
 }
-const AddForm = () => {
+
+interface Props {
+  getTrackData: () => void;
+}
+const AddForm: React.FC<Props> = ({ getTrackData }) => {
   const { register, handleSubmit, reset } = useForm<InputValues>();
 
   const onSubmit = (values: InputValues) => {
-    console.log(values);
+    let newValues = { ...values, amount: Number(values.amount) };
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/tracker/add`, newValues)
+      .then((res) => {
+        console.log(res.data);
+        getTrackData();
+        reset();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <div className="AddForm">
